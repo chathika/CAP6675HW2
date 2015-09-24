@@ -2,11 +2,10 @@ globals [
   percent-similar  ;; on the average, what percent of a turtle's neighbors
                    ;; are the same color as that turtle?
   percent-unhappy  ;; what percent of the turtles are unhappy?
-  num-young-red
-  num-red
-  num-young-green
-  num-green
-  temp
+  num-young-red    ;; number of turtles that are young reds
+  num-red          ;; number of turtles that are old reds
+  num-young-green  ;; number of turtles that are young green
+  num-green        ;; number of turtles that are old green
 ]
 
 turtles-own [
@@ -29,6 +28,7 @@ to setup
     ]
   ]
   
+  ;; Setup the number of young turtles based on the '%-young'
   set num-red (count turtles with [color = red])
   set num-green (count turtles with [color = green])
   set num-young-red (round (num-red * (%-young / 100)))
@@ -89,9 +89,31 @@ to update-turtles
     ;; surrounding the current patch
     
     ;; Add neighbors that are young and old of same color
-    set similar-nearby count (turtles-on neighbors)  with [ (color = [ color ] of myself) or (color = [ color ] of myself + 2) or (color = [ color ] of myself - 2) ]
-    set other-nearby count (turtles-on neighbors) with [ (color != [ color ] of myself) or (color != [ color ] of myself + 2) or (color != [ color] of myself - 2) ]
+    ;; Young Red
+    if color = 17 [
+      set similar-nearby count (turtles-on neighbors) with [ color = red or color = 17 ]
+      set other-nearby count (turtles-on neighbors) with [ color = green or color = 67 ]
+    ]
+    ;; Old Red
+    if color = red [
+      set similar-nearby count (turtles-on neighbors) with [ color = red or color = 17]
+      set other-nearby count (turtles-on neighbors) with [ color = green or color = 67 ]
+    ]
+    ;; Young Green
+    if color = 67 [
+      set similar-nearby count (turtles-on neighbors) with [ color = green or color = 67 ]
+      set other-nearby count (turtles-on neighbors) with [ color = red or color = 17 ]
+    ]
+    ;; Old Green
+    if color = green [
+      set similar-nearby count (turtles-on neighbors) with [ color = green or color = 67]
+      set other-nearby count (turtles-on neighbors) with [ color = red or color = 17 ]
+    ]
+    
+    ;; Set total neighbors
     set total-nearby similar-nearby + other-nearby
+    
+    ;; Set happiness level
     ;; If young red
     if color = 17 [set happy? similar-nearby >= (young-%-similar-wanted * total-nearby / 100)]
     ;; If old red
@@ -100,8 +122,6 @@ to update-turtles
     if color = 67 [set happy? similar-nearby >= (young-%-similar-wanted * total-nearby / 100)]
     ;; If old green
     if color = green [set happy? similar-nearby >= (old-%-similar-wanted * total-nearby / 100)]
-    
-;    set happy? similar-nearby >= (old-%-similar-wanted * total-nearby / 100)
 
     ;; add visualization here
     if visualization = "old" [ set shape "default" ]
@@ -202,7 +222,7 @@ old-%-similar-wanted
 old-%-similar-wanted
 0
 100
-31
+65
 1
 1
 %
@@ -333,7 +353,7 @@ SLIDER
 %-young
 0
 100
-28
+32
 1
 1
 %
