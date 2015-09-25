@@ -2,33 +2,37 @@ globals [
   countRed
   countGreen
   countFree
+  
 ]
 
 patches-own [
   green_tolerance 
   red_tolerance
+  patchType
 ]
 
 to setup
   clear-all
-  if (initial_red > count patches) or ( initial_green > count patches )
+  if (max_red + max_green > count patches) 
     [ user-message (word "This pond only has room for " count patches " turtles.")
       stop ]
-  random-seed new-seed
-  ;; create random patches.
-  ask n-of initial_red patches [
-    set pcolor red
-  ]
-  random-seed new-seed
-  ask n-of initial_green patches with [pcolor = black] [ 
-    set pcolor green 
-  ]
     
-  ask patches [
-    set green_tolerance random-normal ((max_g_to_r / 2) * (max_red / 2)) ( max_green / 4 )
-    set red_tolerance random-normal ((max_r_to_g / 2) * (max_green / 2)) ( max_red / 4 )
+  ask n-of max_red patches [
+    set patchType "red"
+    set countRed (countRed + 1)
+    set green_tolerance (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r) * countRed
+    if countRed <= initial_red
+    [set pcolor red]
   ]
-  
+  ask n-of max_green patches  with [patchType != "red"] [
+    set patchType "green"
+    set countGreen (countGreen + 1)
+    set red_tolerance (((-1 * max_r_to_g / max_green) * countgreen) + max_r_to_g) * countGreen
+    if countGreen <= initial_green
+    [set pcolor green
+      ]
+    print red_tolerance
+  ]  
   ;update
   reset-ticks
 end
