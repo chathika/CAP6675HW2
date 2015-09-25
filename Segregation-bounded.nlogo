@@ -52,34 +52,40 @@ to update
   let current_r_to_g (((-1 * max_r_to_g / max_green) * countGreen) + max_r_to_g)
   ;print current_r_to_g
   ifelse countRed > (current_r_to_g * countGreen) [ ;too many reds
+    if any? patches with [pcolor = green and patchType = "green"] [
     ask one-of patches with [ pcolor = green ] ;with-min [ red_tolerance ] 
     [
       set pcolor black
     ]
+    ]
   ]  
   [
-    ask one-of patches with [ pcolor = black ] ;with-max [ red_tolerance ] 
+        if any? patches with [pcolor = black and patchType = "green"] [
+    ask one-of patches with [ pcolor = black and patchType = "green"] ;with-max [ red_tolerance ] 
     [
-      print "back"
-      set pcolor red
+      set pcolor green
     ]
+        ]
   ]
   
   let current_g_to_r (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r)
   ;print current_g_to_r
   ifelse countGreen > (current_g_to_r * countRed) [ ;too many greens
-    ask one-of patches with [ pcolor = red ] with-min [ green_tolerance ] 
-    [
-      print "rid"
-      set pcolor black
-    ]
+        if any? patches with [pcolor = red and patchType = "red"] [
+          ask one-of patches with [ pcolor = red ] ;with-min [ green_tolerance ] 
+          [
+            set pcolor black
+          ]
+        ]
   ]  
   [
-    ask one-of patches with [ pcolor = black ] with-max [ green_tolerance ] 
-    [
-      set pcolor green
+    if any? patches with [pcolor = black and patchType = "red"] [
+      ask one-of patches with [ pcolor = black and patchType = "red"] ;with-max [ green_tolerance ] 
+      [
+        set pcolor red
+      ]
     ]
-    set-current-plot "green_tolerance"
+    ;set-current-plot "green_tolerance"
  
   ]  
 end
