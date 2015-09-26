@@ -1,13 +1,14 @@
 globals [
   countRed
   countGreen
-  countFree  
+  countFree
 ]
 
 patches-own [
   green_tolerance 
   red_tolerance
   patchType
+  age
 ]
 
 to setup
@@ -15,24 +16,30 @@ to setup
   if (max_red + max_green > count patches) 
     [ user-message (word "This pond only has room for " count patches " turtles.")
       stop ]
-    
+  set countRed  0
   ask n-of max_red patches [
     set patchType "red"
     set countRed (countRed + 1)
     set green_tolerance (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r) * countRed
     if countRed <= initial_red
-    [set pcolor red]
+    [
+      set pcolor red
+      set age random-normal mean_red_age 25
+    ]
     set-current-plot "tolerance"
     set-current-plot-pen "red"
     plotxy countRed green_tolerance 
   ]
+set  countGreen 0
   ask n-of max_green patches  with [patchType != "red"] [
     set patchType "green"
     set countGreen (countGreen + 1)
     set red_tolerance (((-1 * max_r_to_g / max_green) * countgreen) + max_r_to_g) * countGreen
     if countGreen <= initial_green
-    [set pcolor green
-      ]
+    [
+      set pcolor green
+      set age random-normal mean_red_age 25
+    ]
     print red_tolerance
     set-current-plot "tolerance"
     set-current-plot-pen "green"
@@ -45,8 +52,6 @@ end
 to go
   ;if all? turtles [happy?] [ stop ]
   update
-  if count patches with [pcolor = green] = 0 [stop ]
-  if count patches with [pcolor = red] = 0 [stop ]
   tick
 end
 
@@ -62,7 +67,16 @@ to update
     if any? patches with [pcolor = green and patchType = "green"] [
     ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
     [
-      set pcolor black
+      ifelse aging = true
+      [
+         if ((random 100) < (((max [age] of patches - age) / (max [age] of patches) ) * 100))
+         [
+            set pcolor black
+         ]
+      ]
+      [
+        set pcolor black
+      ]
     ]
     ]
   ]  
@@ -70,7 +84,10 @@ to update
         if any? patches with [pcolor = black and patchType = "green"] [
     ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
     [
-      set pcolor green
+      if aging = true [
+        set age 1
+      ]
+        set pcolor green
     ]
         ]
   ]
@@ -78,21 +95,44 @@ to update
   let current_g_to_r (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r)
   ;print current_g_to_r
   ifelse countGreen > (current_g_to_r * countRed) [ ;too many greens
-        if any? patches with [pcolor = red and patchType = "red"] [
-          ask one-of patches with [ pcolor = red ] with-min [ green_tolerance ] 
+    if any? patches with [pcolor = red and patchType = "red"] [
+      ask one-of patches with [ pcolor = red ] with-min [ green_tolerance ] 
+      [
+        ifelse aging = true
+        [
+          if ((random 100) < (((max [age] of patches - age) / (max [age] of patches) ) * 100))
           [
             set pcolor black
           ]
         ]
+        [
+          set pcolor black
+        ]
+      ]
+    ]
   ]  
   [
     if any? patches with [pcolor = black and patchType = "red"] [
       ask one-of patches with [ pcolor = black and patchType = "red"] with-max [ green_tolerance ] 
       [
+        if aging = true [
+          set age 1
+        ]
         set pcolor red
       ]
     ]
   ] 
+  if aging = true 
+  [
+    ask patches with [pcolor = red or pcolor = green]
+    [
+      set age age + 1
+;      if age > 100
+;      [
+;        set age 0
+;      ]
+    ]
+  ]
   set-current-plot "tolerance"
   set-current-plot-pen "state"
   plotxy countRed countGreen  
@@ -165,66 +205,38 @@ PLOT
 141
 262
 284
-Percent Similar
-time
-%
+Ages
+Ages
+NIL
 0.0
-5.0
+100.0
 0.0
 100.0
 true
 false
 "" ""
 PENS
-"percent" 1.0 0 -2674135 true "" "plot percent-similar"
+"reds" 1.0 0 -2674135 true "" "if any? patches with [pcolor = red] \n[\nplot mean [age] of patches with [pcolor = red]\n]"
+"green" 1.0 0 -13840069 true "" "if any? patches with [pcolor = green]\n[\nplot mean [age] of patches with [pcolor = green]\n]"
 
 PLOT
 12
 286
 261
 429
-Percent Unhappy
+New Agents
 time
-%
+NIL
 0.0
-5.0
+100.0
 0.0
 100.0
 true
 false
 "" ""
 PENS
-"percent" 1.0 0 -10899396 true "" "plot percent-unhappy"
-
-SLIDER
-19
-22
-231
-55
-number
-number
-500
-2500
-2000
-10
-1
-NIL
-HORIZONTAL
-
-SLIDER
-19
-95
-231
-128
-%-similar-wanted
-%-similar-wanted
-0
-100
-21
-1
-1
-%
-HORIZONTAL
+"green" 1.0 0 -10899396 true "" "histogram [age] of patches with [pcolor = green]"
+"red" 1.0 0 -2674135 true "" "histogram [age] of patches with [pcolor = green]"
 
 BUTTON
 48
@@ -278,13 +290,13 @@ HORIZONTAL
 SLIDER
 718
 61
-891
+890
 94
 max_g_to_r
 max_g_to_r
 0
-3
-3
+5
+2.5
 0.1
 1
 NIL
@@ -306,15 +318,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-889
+890
 61
-1076
+1062
 94
 max_r_to_g
 max_r_to_g
 0
-3
-3
+5
+5
 0.1
 1
 NIL
@@ -329,7 +341,7 @@ initial_red
 initial_red
 0
 max_red
-37
+44
 1
 1
 NIL
@@ -344,17 +356,17 @@ initial_green
 initial_green
 0
 max_green
-82
+64
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-721
-148
-921
-298
+944
+340
+1144
+490
 Populations
 NIL
 NIL
@@ -370,10 +382,10 @@ PENS
 "green" 1.0 0 -13840069 true "" "plot count patches with [pcolor = green]"
 
 MONITOR
-987
-179
-1044
-224
+1081
+159
+1131
+204
 reds
 count patches with [pcolor = red]
 17
@@ -381,10 +393,10 @@ count patches with [pcolor = red]
 11
 
 MONITOR
-989
-246
-1201
-291
+1081
+203
+1131
+248
 greens
 count patches with [pcolor = green]
 17
@@ -410,6 +422,47 @@ PENS
 "green" 1.0 0 -13840069 true "" ""
 "red" 1.0 0 -2674135 true "" ""
 "state" 1.0 0 -16514302 true "" ""
+
+SWITCH
+104
+14
+207
+47
+aging
+aging
+0
+1
+-1000
+
+SLIDER
+719
+148
+891
+181
+mean_red_age
+mean_red_age
+0
+100
+78
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+890
+148
+1062
+181
+mean_green_age
+mean_green_age
+0
+100
+50
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -763,7 +816,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.0
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
