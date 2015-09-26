@@ -23,6 +23,9 @@ to setup
     set green_tolerance (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r) * countRed
     if countRed <= initial_red
     [set pcolor red]
+    set-current-plot "tolerance"
+    set-current-plot-pen "red"
+    plotxy countRed green_tolerance 
   ]
   ask n-of max_green patches  with [patchType != "red"] [
     set patchType "green"
@@ -32,6 +35,9 @@ to setup
     [set pcolor green
       ]
     print red_tolerance
+    set-current-plot "tolerance"
+    set-current-plot-pen "green"
+    plotxy red_tolerance  countGreen 
   ]  
   ;update
   reset-ticks
@@ -85,13 +91,15 @@ to update
         set pcolor red
       ]
     ]
-    ;set-current-plot "green_tolerance"
- 
+    ;
+    set-current-plot "tolerance"
+    set-current-plot-pen "state"
+    plotxy countRed countGreen 
   ]  
 end
 
 
-to update-globals
+to update-graph
 
   ;let similar-neighbors sum [similar-nearby] of turtles
   ;let total-neighbors sum [total-nearby] of turtles
@@ -261,7 +269,7 @@ max_red
 max_red
 0
 300
-50
+101
 1
 1
 NIL
@@ -276,7 +284,7 @@ max_g_to_r
 max_g_to_r
 0
 3
-1
+2
 0.1
 1
 NIL
@@ -306,7 +314,7 @@ max_r_to_g
 max_r_to_g
 0
 3
-1
+2
 0.1
 1
 NIL
@@ -321,7 +329,7 @@ initial_red
 initial_red
 0
 300
-25
+29
 1
 1
 NIL
@@ -336,7 +344,7 @@ initial_green
 initial_green
 0
 300
-19
+29
 1
 1
 NIL
@@ -388,18 +396,20 @@ PLOT
 340
 922
 490
-green_tolerance
+tolerance
 NIL
 NIL
 0.0
-300.0
+10.0
 0.0
-300.0
+10.0
 true
 false
 "" ""
 PENS
-"green" 1.0 0 -7500403 true "" ""
+"green" 1.0 0 -13840069 true "" ""
+"red" 1.0 0 -2674135 true "" ""
+"state" 1.0 0 -16514302 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?
