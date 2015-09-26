@@ -298,7 +298,7 @@ density
 density
 50
 99
-86
+85
 1
 1
 NIL
@@ -353,7 +353,7 @@ SLIDER
 %-young
 0
 100
-32
+40
 1
 1
 %
@@ -434,7 +434,7 @@ young-%-similar-wanted
 young-%-similar-wanted
 0
 100
-30
+31
 1
 1
 %
@@ -863,6 +863,18 @@ NetLogo 5.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="Local_Neighborhood_Vary_Young _Tolerance" repetitions="5" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>percent-similar</metric>
+    <metric>count turtles with [not happy?]</metric>
+    <metric>percent-unhappy</metric>
+    <metric>ticks</metric>
+    <steppedValueSet variable="young-%-similar-wanted" first="0" step="5" last="100"/>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
