@@ -60,19 +60,30 @@ to update
   ;print current_r_to_g
   ifelse countRed > (current_r_to_g * countGreen) [ ;too many reds
     if any? patches with [pcolor = green and patchType = "green"] [
-    ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
-    [
-      set pcolor black
-    ]
+      ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
+      [
+        set pcolor black
+      ]
+      if Disruption > 0 [
+        let rand random Disruption
+        let greens count patches with [ pcolor = green ]
+        let reps min list rand greens
+        repeat reps [
+          ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
+          [
+            set pcolor black
+          ]
+        ]
+      ] 
     ]
   ]  
   [
-        if any? patches with [pcolor = black and patchType = "green"] [
-    ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
-    [
-      set pcolor green
+    if any? patches with [pcolor = black and patchType = "green"] [
+      ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
+      [
+        set pcolor green
+      ]
     ]
-        ]
   ]
   
   let current_g_to_r (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r)
@@ -205,7 +216,7 @@ number
 number
 500
 2500
-2000
+500
 10
 1
 NIL
@@ -220,7 +231,7 @@ SLIDER
 %-similar-wanted
 0
 100
-21
+100
 1
 1
 %
@@ -269,7 +280,7 @@ max_red
 max_red
 0
 300
-101
+76
 1
 1
 NIL
@@ -283,8 +294,8 @@ SLIDER
 max_g_to_r
 max_g_to_r
 0
-3
-3
+5
+5
 0.1
 1
 NIL
@@ -299,7 +310,7 @@ max_green
 max_green
 0
 300
-101
+73
 1
 1
 NIL
@@ -313,8 +324,8 @@ SLIDER
 max_r_to_g
 max_r_to_g
 0
-3
-3
+5
+5
 0.1
 1
 NIL
@@ -329,7 +340,7 @@ initial_red
 initial_red
 0
 max_red
-37
+76
 1
 1
 NIL
@@ -344,7 +355,7 @@ initial_green
 initial_green
 0
 max_green
-82
+73
 1
 1
 NIL
@@ -409,7 +420,18 @@ false
 PENS
 "green" 1.0 0 -13840069 true "" ""
 "red" 1.0 0 -2674135 true "" ""
-"state" 1.0 0 -16514302 true "" ""
+"state" 1.0 2 -16514302 true "" ""
+
+INPUTBOX
+1021
+356
+1091
+416
+Disruption
+33
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
