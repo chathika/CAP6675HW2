@@ -45,6 +45,8 @@ end
 to go
   ;if all? turtles [happy?] [ stop ]
   update
+  if count patches with [pcolor = green] = 0 [stop ]
+  if count patches with [pcolor = red] = 0 [stop ]
   tick
 end
 
@@ -218,7 +220,7 @@ SLIDER
 %-similar-wanted
 0
 100
-49
+21
 1
 1
 %
@@ -282,7 +284,7 @@ max_g_to_r
 max_g_to_r
 0
 3
-2
+3
 0.1
 1
 NIL
@@ -312,7 +314,7 @@ max_r_to_g
 max_r_to_g
 0
 3
-2
+3
 0.1
 1
 NIL
@@ -761,7 +763,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
+NetLogo 5.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
