@@ -59,7 +59,7 @@ to update
   ;print current_r_to_g
   ifelse countRed > (current_r_to_g * countGreen) [ ;too many reds
     if any? patches with [pcolor = green and patchType = "green"] [
-    ask one-of patches with [ pcolor = green ] ;with-min [ red_tolerance ] 
+    ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
     [
       set pcolor black
     ]
@@ -67,7 +67,7 @@ to update
   ]  
   [
         if any? patches with [pcolor = black and patchType = "green"] [
-    ask one-of patches with [ pcolor = black and patchType = "green"] ;with-max [ red_tolerance ] 
+    ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
     [
       set pcolor green
     ]
@@ -78,7 +78,7 @@ to update
   ;print current_g_to_r
   ifelse countGreen > (current_g_to_r * countRed) [ ;too many greens
         if any? patches with [pcolor = red and patchType = "red"] [
-          ask one-of patches with [ pcolor = red ] ;with-min [ green_tolerance ] 
+          ask one-of patches with [ pcolor = red ] with-min [ green_tolerance ] 
           [
             set pcolor black
           ]
@@ -86,16 +86,15 @@ to update
   ]  
   [
     if any? patches with [pcolor = black and patchType = "red"] [
-      ask one-of patches with [ pcolor = black and patchType = "red"] ;with-max [ green_tolerance ] 
+      ask one-of patches with [ pcolor = black and patchType = "red"] with-max [ green_tolerance ] 
       [
         set pcolor red
       ]
     ]
-    ;
-    set-current-plot "tolerance"
-    set-current-plot-pen "state"
-    plotxy countRed countGreen 
-  ]  
+  ] 
+  set-current-plot "tolerance"
+  set-current-plot-pen "state"
+  plotxy countRed countGreen  
 end
 
 
@@ -328,8 +327,8 @@ SLIDER
 initial_red
 initial_red
 0
-300
-29
+max_red
+65
 1
 1
 NIL
@@ -343,8 +342,8 @@ SLIDER
 initial_green
 initial_green
 0
-300
-29
+max_green
+65
 1
 1
 NIL
