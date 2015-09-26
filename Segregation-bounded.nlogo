@@ -1,8 +1,7 @@
 globals [
   countRed
   countGreen
-  countFree
-  
+  countFree  
 ]
 
 patches-own [
@@ -328,7 +327,7 @@ initial_red
 initial_red
 0
 max_red
-65
+37
 1
 1
 NIL
@@ -343,7 +342,7 @@ initial_green
 initial_green
 0
 max_green
-65
+82
 1
 1
 NIL
@@ -366,7 +365,7 @@ false
 "" ""
 PENS
 "red" 1.0 0 -2674135 true "" "plot count patches with [pcolor = red]"
-"green" 1.0 0 -7500403 true "" "plot count patches with [pcolor = green]"
+"green" 1.0 0 -13840069 true "" "plot count patches with [pcolor = green]"
 
 MONITOR
 987
