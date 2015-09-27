@@ -2,13 +2,15 @@ globals [
   countRed
   countGreen
   countFree
+  reds
+  greens
 ]
 
 patches-own [
   green_tolerance 
   red_tolerance
   patchType
-  age
+  LoR
 ]
 
 to setup
@@ -24,13 +26,13 @@ to setup
     if countRed <= initial_red
     [
       set pcolor red
-      set age random-normal mean_red_age 25
+      set LoR random-normal mean_red_LoR 25
     ]
     set-current-plot "tolerance"
     set-current-plot-pen "red"
     plotxy countRed green_tolerance 
   ]
-set  countGreen 0
+  set  countGreen 0
   ask n-of max_green patches  with [patchType != "red"] [
     set patchType "green"
     set countGreen (countGreen + 1)
@@ -38,20 +40,37 @@ set  countGreen 0
     if countGreen <= initial_green
     [
       set pcolor green
-      set age random-normal mean_red_age 25
+      set LoR random-normal mean_red_LoR 25
     ]
     print red_tolerance
     set-current-plot "tolerance"
     set-current-plot-pen "green"
     plotxy red_tolerance  countGreen 
-  ]  
+  ] 
+   set reds []
+set greens []
   ;update
   reset-ticks
 end
 
 to go
-  ;if all? turtles [happy?] [ stop ]
+  if countGreen = 0 [stop ]
+  if countRed = 0 [stop ]
+  set reds lput countRed reds
+  if length reds > 20 [
+    set reds but-first reds
+  ]
+  set greens lput countGreen greens
+  if length greens > 20 [
+    set greens but-first greens
+  ]
+  print max reds
+    print min reds
+  if (((max reds - min reds) > 3) and ((max greens - min greens) > 3) and (length reds = 20) and (length greens = 20)) [stop]
+  
   update
+  update-graph
+  
   tick
 end
 
@@ -63,13 +82,14 @@ to update
 
   let current_r_to_g (((-1 * max_r_to_g / max_green) * countGreen) + max_r_to_g)
   ;print current_r_to_g
-  ifelse countRed > (current_r_to_g * countGreen) [ ;too many reds
+  ifelse countRed > (current_r_to_g * countGreen) 
+  [ ;too many reds
     if any? patches with [pcolor = green and patchType = "green"] [
     ask one-of patches with [ pcolor = green ] with-min [ red_tolerance ] 
     [
-      ifelse aging = true
+      ifelse LoR = true
       [
-         if ((random 100) < (((max [age] of patches - age) / (max [age] of patches) ) * 100))
+         if ((random 100) < (((max [LoR] of patches - LoR) / (max [LoR] of patches) ) * 100))
          [
             set pcolor black
          ]
@@ -79,17 +99,17 @@ to update
       ]
     ]
     ]
-  ]  
+  ] 
   [
-        if any? patches with [pcolor = black and patchType = "green"] [
-    ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
-    [
-      if aging = true [
-        set age 1
-      ]
-        set pcolor green
-    ]
+    if any? patches with [pcolor = black and patchType = "green"] [
+      ask one-of patches with [ pcolor = black and patchType = "green"] with-max [ red_tolerance ] 
+      [
+        if LoR? = true [
+          set LoR 1
         ]
+          set pcolor green
+      ]
+    ]
   ]
   
   let current_g_to_r (((-1 * max_g_to_r / max_red) * countRed) + max_g_to_r)
@@ -98,9 +118,9 @@ to update
     if any? patches with [pcolor = red and patchType = "red"] [
       ask one-of patches with [ pcolor = red ] with-min [ green_tolerance ] 
       [
-        ifelse aging = true
+        ifelse LoR? = true
         [
-          if ((random 100) < (((max [age] of patches - age) / (max [age] of patches) ) * 100))
+          if ((random 100) < (((max [LoR] of patches - LoR) / (max [LoR] of patches) ) * 100))
           [
             set pcolor black
           ]
@@ -115,32 +135,28 @@ to update
     if any? patches with [pcolor = black and patchType = "red"] [
       ask one-of patches with [ pcolor = black and patchType = "red"] with-max [ green_tolerance ] 
       [
-        if aging = true [
-          set age 1
+        if LoR? = true [
+          set LoR 1
         ]
         set pcolor red
       ]
     ]
   ] 
-  if aging = true 
+  if LoR? = true 
   [
     ask patches with [pcolor = red or pcolor = green]
     [
-      set age age + 1
-;      if age > 100
-;      [
-;        set age 0
-;      ]
+      set LoR LoR + 1
     ]
   ]
-  set-current-plot "tolerance"
-  set-current-plot-pen "state"
-  plotxy countRed countGreen  
+  
 end
 
 
 to update-graph
-
+  set-current-plot "tolerance"
+  set-current-plot-pen "state"
+  plotxy countRed countGreen  
   ;let similar-neighbors sum [similar-nearby] of turtles
   ;let total-neighbors sum [total-nearby] of turtles
   ;set percent-similar (similar-neighbors / total-neighbors) * 100
@@ -183,9 +199,9 @@ PLOT
 16
 991
 159
-Ages
-Ages
-NIL
+LoR
+Time
+LoR
 0.0
 100.0
 0.0
@@ -194,8 +210,8 @@ true
 false
 "" ""
 PENS
-"reds" 1.0 0 -2674135 true "" "if any? patches with [pcolor = red] \n[\nplot mean [age] of patches with [pcolor = red]\n]"
-"green" 1.0 0 -13840069 true "" "if any? patches with [pcolor = green]\n[\nplot mean [age] of patches with [pcolor = green]\n]"
+"reds" 1.0 0 -2674135 true "" "if any? patches with [pcolor = red] \n[\nplot mean [LoR] of patches with [pcolor = red]\n]"
+"green" 1.0 0 -13840069 true "" "if any? patches with [pcolor = green]\n[\nplot mean [LoR] of patches with [pcolor = green]\n]"
 
 PLOT
 741
@@ -204,7 +220,7 @@ PLOT
 304
 New Agents
 time
-NIL
+LoR
 0.0
 100.0
 0.0
@@ -213,8 +229,8 @@ true
 false
 "" ""
 PENS
-"green" 1.0 0 -10899396 true "" "histogram [age] of patches with [pcolor = green]"
-"red" 1.0 0 -2674135 true "" "histogram [age] of patches with [pcolor = green]"
+"green" 1.0 0 -10899396 true "" "histogram [LoR] of patches with [pcolor = green]"
+"red" 1.0 0 -2674135 true "" "histogram [LoR] of patches with [pcolor = green]"
 
 BUTTON
 8
@@ -289,7 +305,7 @@ max_green
 max_green
 0
 300
-101
+99
 1
 1
 NIL
@@ -319,7 +335,7 @@ initial_red
 initial_red
 0
 max_red
-15
+41
 1
 1
 NIL
@@ -334,7 +350,7 @@ initial_green
 initial_green
 0
 max_green
-64
+47
 1
 1
 NIL
@@ -406,8 +422,8 @@ SWITCH
 10
 112
 43
-aging
-aging
+LoR?
+LoR?
 0
 1
 -1000
@@ -417,11 +433,11 @@ SLIDER
 209
 181
 242
-mean_red_age
-mean_red_age
+mean_red_LoR
+mean_red_LoR
 0
 100
-96
+50
 1
 1
 NIL
@@ -432,8 +448,8 @@ SLIDER
 209
 352
 242
-mean_green_age
-mean_green_age
+mean_green_LoR
+mean_green_LoR
 0
 100
 50
